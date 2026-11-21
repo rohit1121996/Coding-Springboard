@@ -93,7 +93,7 @@ export default function Dashboard({ user, onLogout }: Props) {
 
       <main className="workspace">
         <div className="page-heading">
-          <div>
+          <div className="page-heading-copy">
             <p className="eyebrow">{reviewer ? 'REVIEW WORKSPACE' : 'YOUR WORKSPACE'}</p>
             <h1>{reviewer ? 'Review queue' : 'My documents'}</h1>
             <p className="muted">
@@ -102,28 +102,34 @@ export default function Dashboard({ user, onLogout }: Props) {
                 : 'Submit a document and follow its progress.'}
             </p>
           </div>
-          <div className="heading-icon" aria-hidden="true">{reviewer ? '☑' : '▤'}</div>
+          <div className="hero-flow" aria-hidden="true">
+            <div><span>01</span><strong>Submit</strong></div>
+            <div><span>02</span><strong>Review</strong></div>
+            <div><span>03</span><strong>Decide</strong></div>
+          </div>
         </div>
 
         {notice && <div className="success" role="status">{notice}</div>}
         {error && <div className="alert" role="alert">{error}</div>}
 
-        {!reviewer && (
-          <SubmissionForm onCreate={create} onError={setError} />
-        )}
+        <div className={`dashboard-content ${reviewer ? '' : 'dashboard-content--submitter'}`}>
+          {!reviewer && (
+            <SubmissionForm onCreate={create} onError={setError} />
+          )}
 
-        <SubmissionList
-          reviewer={reviewer}
-          submissions={submissions}
-          selectedId={selectedId}
-          filter={filter}
-          loading={loading}
-          deciding={deciding}
-          onRefresh={() => void refresh()}
-          onFilterChange={setFilter}
-          onSelect={setSelectedId}
-          onDecision={decide}
-        />
+          <SubmissionList
+            reviewer={reviewer}
+            submissions={submissions}
+            selectedId={selectedId}
+            filter={filter}
+            loading={loading}
+            deciding={deciding}
+            onRefresh={() => void refresh()}
+            onFilterChange={setFilter}
+            onSelect={setSelectedId}
+            onDecision={decide}
+          />
+        </div>
       </main>
     </div>
   )

@@ -109,14 +109,26 @@ Submitters only query their own records, including on direct detail lookup. Revi
 - In production mode Django redirects to HTTPS and sends HSTS. If TLS terminates at a reverse proxy, set `DJANGO_TRUST_X_FORWARDED_PROTO=1` only when that proxy controls the forwarded-protocol header.
 - React renders document text as text, preventing user content from becoming HTML. The application does not accept file uploads in this iteration.
 - Database migrations capture schema changes. Decision updates are conditional and atomic. The UI shows failures and disables in-flight actions.
-- SQLite and the unpaginated listing are suitable for the challenge's small local dataset. For production, move to PostgreSQL, add paginated queries and indexes tailored to observed usage, use shared session storage, add rate limiting, structured logs, monitoring, backup/restore checks, and deployment health checks.
+- SQLite is used only for local development. Vercel deployments require PostgreSQL through `DATABASE_URL`. The unpaginated listing suits the challenge's small dataset; add pagination, rate limiting, structured logs, monitoring, backup/restore checks, and deployment health checks as usage grows.
 - If file uploads become necessary, put file metadata on submissions and store files in private object storage with type/size checks, malware scanning, and authorized download URLs. Notifications and audit events can be added as separate modules.
 
 ## Trade-offs and follow-up
 
 The challenge specifies a two-hour budget, so this version prioritizes the complete submit-review-track loop, authorization, and tests. It does not include user registration, file uploads, comments, decision reversal, notification delivery, pagination, or public hosting. Those are deliberate extension points, not prerequisites for the requested first iteration.
 
-The application can be hosted behind one HTTPS origin: serve the built React assets at `/` and route `/api` to Django. Replace SQLite with PostgreSQL and set production environment variables before public deployment. Never use the local demo credentials in production.
+The Vercel configuration serves the built React assets at `/` and Django at `/api` on one HTTPS origin. Never use the local demo credentials in production.
+
+## Deploy with GitHub Actions and Vercel
+
+The root `vercel.json` defines one Vite frontend service and one Django backend service. Vercel Services currently requires **Framework Preset: Services** in the Vercel project's Build and Deployment settings. Use this repository's root directory as the Vercel project root. The project configuration disables Vercel's automatic Git deployments so the GitHub Action owns production deployment.
+
+1. Create a Vercel project for this repository and set its framework preset to **Services**. Enable **Automatically expose System Environment Variables** in its Environment Variables settings, so the backend can allow the deployment host.
+2. Connect a PostgreSQL database, such as a Vercel Marketplace Postgres integration, and set these **Vercel Production environment variables**: `DATABASE_URL` (a PostgreSQL URL) and a long random `DJANGO_SECRET_KEY`. Add `DJANGO_ALLOWED_HOSTS` and `DJANGO_CSRF_TRUSTED_ORIGINS` if you use an additional custom domain. Set `DJANGO_DEBUG=0` explicitly.
+3. Link the project with the Vercel CLI (`vercel link`) and get `orgId` and `projectId` from `.vercel/project.json`. Create a scoped Vercel access token.
+4. Add these **GitHub repository secrets**: `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, `DATABASE_URL`, `DJANGO_SECRET_KEY`, `DEMO_SUBMITTER_PASSWORD`, and `DEMO_REVIEWER_PASSWORD`. The database URL and Django secret key must match the values in Vercel. Choose new demo passwords for the public deployment.
+5. Push to `main` or run the workflow manually from `main`. The Action runs the tests, applies migrations, creates demo users, builds both services, and deploys the prebuilt result. Its job summary contains the production URL. Pull requests run tests without deploying.
+
+The deployment job fails with a clear missing-secret message until those account settings are complete. Do not commit `.vercel/`, database URLs, passwords, or tokens; `.vercel/` and local database files are ignored by Git.
 
 ## Submission checklist
 

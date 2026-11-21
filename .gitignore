@@ -3,6 +3,7 @@ __pycache__/
 *.py[cod]
 *.sqlite3
 .env
+.vercel/
 node_modules/
 dist/
 coverage/

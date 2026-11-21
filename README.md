@@ -10,6 +10,14 @@ A small document approval application for the Springboard take-home challenge. S
 - Document format: title plus text input. The challenge permits a file **or** an input; text keeps this iteration small and testable.
 - No public signup. Local demo accounts are created by a management command.
 
+## Project structure
+
+- `frontend/src/App.tsx` handles the current session and chooses the login or dashboard view.
+- `frontend/src/Dashboard.tsx` coordinates submissions, filters, and decisions.
+- `frontend/src/components/` holds the login, submission form, list, detail, and status badge UI.
+- `frontend/src/api.ts` is the single place for HTTP requests and API types.
+- `backend/submissions/` contains the model, serializers, permissions in views, API routes, and tests.
+
 ## Run locally
 
 Prerequisites: Python 3.11+ and Node.js 20.19+ or 22.12+.

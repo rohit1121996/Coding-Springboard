@@ -29,6 +29,10 @@ export class ApiError extends Error {
   }
 }
 
+export function errorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : 'Something went wrong. Please try again.'
+}
+
 async function csrfToken(): Promise<string> {
   const response = await fetch('/api/csrf', { credentials: 'same-origin' })
   if (!response.ok) throw new Error('Could not initialize the secure session.')

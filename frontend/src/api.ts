@@ -34,7 +34,12 @@ export function errorMessage(error: unknown): string {
 }
 
 async function csrfToken(): Promise<string> {
-  const response = await fetch('/api/csrf', { credentials: 'same-origin' })
+  let response: Response
+  try {
+    response = await fetch('/api/csrf', { credentials: 'same-origin' })
+  } catch {
+    throw new Error('Cannot reach the server. Please try again.')
+  }
   if (!response.ok) throw new Error('Could not initialize the secure session.')
   const data = (await response.json()) as { csrfToken: string }
   return data.csrfToken

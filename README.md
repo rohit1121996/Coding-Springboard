@@ -55,7 +55,7 @@ After installing dependencies, run all checks with one command:
 bash scripts/test.sh
 ```
 
-The backend tests cover login CSRF, bad credentials, create and validation, ownership, reviewer permissions, approve/reject, terminal-state conflict, and anonymous access. The frontend tests exercise the submitter creation flow and reviewer approval flow. The script also checks the production frontend build.
+The backend tests cover login CSRF, bad credentials, create and validation, ownership, reviewer permissions, approve/reject, terminal-state conflict, and anonymous access. The frontend tests exercise submission, approval, validation errors, decision conflicts, and retrying a failed session check. The script also checks the production frontend build.
 
 ## API design
 

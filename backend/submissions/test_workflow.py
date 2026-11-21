@@ -93,6 +93,26 @@ class WorkflowSecurityTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["status"], "rejected")
 
+    def test_submitter_tracks_the_reviewers_decision(self):
+        self.login("alice")
+        created = self.post("/api/submissions", {"title": "Plan", "content": "Please review"})
+        submission_id = created.json()["id"]
+
+        self.client.delete("/api/session", HTTP_X_CSRFTOKEN=self.csrf)
+        self.csrf = self.client.get("/api/csrf").json()["csrfToken"]
+        self.login("reviewer")
+        decision = self.post(
+            f"/api/submissions/{submission_id}/decision", {"decision": "approved"}
+        )
+        self.assertEqual(decision.status_code, 200)
+
+        self.client.delete("/api/session", HTTP_X_CSRFTOKEN=self.csrf)
+        self.csrf = self.client.get("/api/csrf").json()["csrfToken"]
+        self.login("alice")
+        tracked = self.client.get(f"/api/submissions/{submission_id}")
+        self.assertEqual(tracked.json()["status"], "approved")
+        self.assertEqual(tracked.json()["decided_by"], "reviewer")
+
     def test_csrf_is_required_for_authenticated_writes(self):
         self.login("alice")
         response = self.client.post(

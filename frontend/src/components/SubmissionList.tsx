@@ -33,7 +33,7 @@ export default function SubmissionList({
           <p className="eyebrow">{reviewer ? 'SUBMISSIONS' : 'TRACK PROGRESS'}</p>
           <h2>{reviewer ? 'Submitted documents' : 'Your submissions'}</h2>
         </div>
-        <button className="text-button" onClick={onRefresh} disabled={loading}>Refresh ↻</button>
+        <button className="text-button" onClick={onRefresh} disabled={loading || deciding}>Refresh ↻</button>
       </div>
 
       <div className="filters" role="group" aria-label="Filter by status">
@@ -43,6 +43,7 @@ export default function SubmissionList({
             className={`filter ${filter === value ? 'filter--active' : ''}`}
             onClick={() => onFilterChange(value)}
             aria-pressed={filter === value}
+            disabled={deciding}
           >
             {value === 'all' ? 'All' : value[0].toUpperCase() + value.slice(1)}
           </button>
@@ -69,6 +70,7 @@ export default function SubmissionList({
                 key={submission.id}
                 className={`submission-row ${selectedId === submission.id ? 'submission-row--selected' : ''}`}
                 onClick={() => onSelect(submission.id)}
+                disabled={deciding}
               >
                 <span className="submission-title">{submission.title}</span>
                 <StatusBadge status={submission.status} />

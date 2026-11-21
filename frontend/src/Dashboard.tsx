@@ -25,8 +25,10 @@ export default function Dashboard({ user, onLogout }: Props) {
       const result = await api.list(filter === 'all' ? undefined : filter)
       setSubmissions(result)
       setSelectedId(current => result.some(item => item.id === current) ? current : result[0]?.id ?? null)
+      return true
     } catch (cause) {
       setError(errorMessage(cause))
+      return false
     } finally {
       setLoading(false)
     }
@@ -56,11 +58,14 @@ export default function Dashboard({ user, onLogout }: Props) {
         ? submissions.filter(item => item.id !== updated.id)
         : submissions.map(item => item.id === updated.id ? updated : item)
       setSubmissions(remaining)
-      setSelectedId(remaining[0]?.id ?? null)
+      setSelectedId(filter === 'pending' ? remaining[0]?.id ?? null : updated.id)
       setNotice(`Submission ${decision}.`)
     } catch (cause) {
-      setError(errorMessage(cause))
-      if (cause instanceof ApiError && cause.status === 409) void refresh()
+      if (cause instanceof ApiError && cause.status === 409) {
+        if (await refresh()) setError('This submission was already decided. The list has been refreshed.')
+      } else {
+        setError(errorMessage(cause))
+      }
     } finally {
       setDeciding(false)
     }

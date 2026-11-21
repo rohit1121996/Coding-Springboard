@@ -271,6 +271,17 @@ textarea {
   font-weight: 700;
 }
 
+.boot-error {
+  align-content: center;
+  gap: 16px;
+  text-align: center;
+  padding: 24px;
+}
+
+.boot-error p {
+  margin: 0;
+}
+
 .app-shell {
   min-height: 100vh;
 }
